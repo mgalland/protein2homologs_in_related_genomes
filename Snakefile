@@ -15,6 +15,7 @@ configfile:"config.json"
 
 # Genomes fasta files
 GENOMES_DIR = config["genomes"]["dir"]
+LIST_OF_SPECIES = list(config["genomes"]["target_species"].keys())
 
 # Blast configuration
 TBLASTN_PARAMS = " ".join(list(config["blast"]["tblastn"].values()))
@@ -29,7 +30,8 @@ SCAFF_CHR = "blast/protein2genome.outfmt6"
 
 rule all:
 	input:
-		SCAFF_CHR 
+		SCAFF_CHR,	
+		"blast/list_of_regions.txt" 
 
 
 
@@ -49,9 +51,15 @@ rule all:
 ###########################################################################################################
 ## Find scaffold(s) or chromosome for protein of interest (in the species you are working with)
 ###########################################################################################################
-#rule add_header_to_blast_results:
-
-
+rule extract_genomic_matches_sequences:
+    input:"blast/protein2genome.outfmt6"
+    output:"blast/list_of_regions.txt"
+    message:"extracting scaffold(s) / chromosome(s) matched by protein of interest"
+    shell:
+        """
+        tail -n +2 {input} |awk '{{print $3}}' |sort|uniq > {output} 
+        """ 
+      
 rule find_scaffold_or_chromosome:
     input:
         ref = config["genomes"]["dir"] + config["genomes"]["species_of_interest"],
