@@ -18,7 +18,7 @@ GENOMES_DIR = config["genomes"]["dir"]
 
 # Blast configuration
 TBLASTN_PARAMS = " ".join(list(config["blast"]["tblastn"].values()))
-BLAST_HEADER = config["blast"]["header"]
+BLAST_HEADER = "\t".join(config["blast"]["header"].split(" ")) # to add a tab separated header to blast results
 
 # THREADS
 THREADS = 8
