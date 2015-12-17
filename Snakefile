@@ -18,6 +18,7 @@ GENOMES_DIR = config["genomes"]["dir"]
 
 # Blast configuration
 TBLASTN_PARAMS = " ".join(list(config["blast"]["tblastn"].values()))
+BLAST_HEADER = config["blast"]["header"]
 
 # THREADS
 THREADS = 8
@@ -48,12 +49,27 @@ rule all:
 ###########################################################################################################
 ## Find scaffold(s) or chromosome for protein of interest (in the species you are working with)
 ###########################################################################################################
+#rule add_header_to_blast_results:
+
+
 rule find_scaffold_or_chromosome:
     input:
         ref = config["genomes"]["dir"] + config["genomes"]["species_of_interest"],
         protein = config["query_protein"]
     output:"blast/protein2genome.outfmt6"
-    message:"finding scaffold or chromosome where the protein of interest lies"
+    message:"In species of interest, finding scaffold or chromosome where the protein of interest lies"
     shell:
-        "makeblastdb -in {input.ref} -parse_seqids -dbtype nucl -out {input.ref} "
-        "tblastn -num_threads {THREADS} {TBLASTN_PARAMS} -in {input.protein} -out {output}"
+        """
+        makeblastdb -in {input.ref} -parse_seqids -dbtype nucl -out {input.ref};
+        tblastn -num_threads {THREADS} {TBLASTN_PARAMS} -query {input.protein} -db {input.ref} -out {output};
+        sed -i '1s/^/{BLAST_HEADER}\\n/' {output} 
+        """    
+
+
+
+
+
+
+
+
+
