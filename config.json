@@ -1,0 +1,20 @@
+{
+	"ftpdir": "ftp://ftp.ncbi.nlm.nih.gov/genomes/",
+	"species": "/home/mgalland/workspace/others/results/20151214_silke/list_of_species.txt",
+	"query_protein": "/home/mgalland/workspace/others/results/20151214_silke/MsOxi.fasta",
+	"genomes": {
+		"dir": "/home/mgalland/workspace/others/results/20151214_silke/",
+		"species_of_interest": "GCA_000262585.1_Msex_1.0_genomic.fa",
+		"target_species": {
+			"bombyx_mori": "GCF_000151625.1_ASM15162v1_genomic.fa"
+		}
+	},
+	"blast": {
+		"tblastn": {
+			"max_target_seqs":"-max_target_seqs 10",
+			"outfmt":	"-outfmt '6 qseqid qlen sseqid stitle slen pident evalue bitscore length'",
+			"evalue": 	"-evalue 1e-4",
+			"max_target_seqs": "1"
+			}
+	}
+}
