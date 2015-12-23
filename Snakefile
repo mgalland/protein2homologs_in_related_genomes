@@ -57,7 +57,7 @@ rule align_genomes_with_nucmer:
     message:"aligning {input} against {wildcards.species} genome"
     run:
         for species in SPECIES:
-            shell("nucmer -p aln/" + species + " " + SPECIES2GENOMES_DICT[species] + " " + "{input)")
+            shell("nucmer -p aln/" + species + " " + str(GENOMES_DIR + SPECIES2GENOMES_DICT[species]) + " " + "{input}")
             
 ###########################################################################################################
 ## Find scaffold(s) or chromosome harbouring the protein of interest (in the species you are working with)
