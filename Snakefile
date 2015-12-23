@@ -15,8 +15,9 @@ configfile:"config.json"
 
 # Genomes fasta files
 GENOMES_DIR = config["genomes"]["dir"]
-LIST_OF_SPECIES = list(config["genomes"]["target_species"].keys())
-#LIST_OF_SPECIES_FASTAS = list(str(config["genomes"]["dir"]+ config["genomes"]["target_species"].values()))
+SPECIES2GENOMES_DICT = config["genomes"]["target_species"]
+SPECIES = list(config["genomes"]["target_species"].keys())
+SPECIES_GENOMES = [str(GENOMES_DIR + f) for f in list(config["genomes"]["target_species"].values())]
 
 # Blast configuration
 TBLASTN_PARAMS = " ".join(list(config["blast"]["tblastn"].values()))
@@ -28,11 +29,14 @@ THREADS = 8
 
 # Desired outputs
 SCAFF_CHR = "blast/protein2genome.outfmt6"
+QUERY = "blast/query.fasta"
+ALNS = expand("aln/{species}.delta",species = SPECIES)
 
 rule all:
 	input:
 		SCAFF_CHR,	
-		"blast/query_for_all_genomes.fasta"
+		QUERY,
+		ALNS
 
 
 
@@ -43,21 +47,27 @@ rule all:
 #rule download_genomes_from_ncbi:
 
 
-#################
-## Compare 
-##################
-
-
-
+#######################
+## Compare with genomes
+#######################
+rule align_genomes_with_nucmer:
+    input:"blast/query.fasta"
+    output:
+        delta = "aln/{species}.delta"      
+    message:"aligning {input} against {wildcards.species} genome"
+    run:
+        for species in SPECIES:
+            shell("nucmer -p aln/" + species + " " + SPECIES2GENOMES_DICT[species] + " " + "{input)")
+            
 ###########################################################################################################
-## Find scaffold(s) or chromosome for protein of interest (in the species you are working with)
+## Find scaffold(s) or chromosome harbouring the protein of interest (in the species you are working with)
 ###########################################################################################################
 rule extract_fasta_sequences_of_genomic_regions:
     input:
         ids = "blast/list_of_regions.txt",
         ref = config["genomes"]["dir"] + config["genomes"]["species_of_interest"]
     output:
-        "blast/query_for_all_genomes.fasta"
+        "blast/query.fasta"
     message:"retrieving scaffold(s)/chromosome(s) fasta file that match protein of interest"
     shell:
         "blastdbcmd -db {input.ref} -entry_batch {input.ids} > {output}"
