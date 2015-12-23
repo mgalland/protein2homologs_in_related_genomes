@@ -16,6 +16,7 @@ configfile:"config.json"
 # Genomes fasta files
 GENOMES_DIR = config["genomes"]["dir"]
 LIST_OF_SPECIES = list(config["genomes"]["target_species"].keys())
+#LIST_OF_SPECIES_FASTAS = list(str(config["genomes"]["dir"]+ config["genomes"]["target_species"].values()))
 
 # Blast configuration
 TBLASTN_PARAMS = " ".join(list(config["blast"]["tblastn"].values()))
@@ -31,7 +32,7 @@ SCAFF_CHR = "blast/protein2genome.outfmt6"
 rule all:
 	input:
 		SCAFF_CHR,	
-		"blast/list_of_regions.txt" 
+		"blast/query_for_all_genomes.fasta"
 
 
 
@@ -51,7 +52,17 @@ rule all:
 ###########################################################################################################
 ## Find scaffold(s) or chromosome for protein of interest (in the species you are working with)
 ###########################################################################################################
-rule extract_genomic_matches_sequences:
+rule extract_fasta_sequences_of_genomic_regions:
+    input:
+        ids = "blast/list_of_regions.txt",
+        ref = config["genomes"]["dir"] + config["genomes"]["species_of_interest"]
+    output:
+        "blast/query_for_all_genomes.fasta"
+    message:"retrieving scaffold(s)/chromosome(s) fasta file that match protein of interest"
+    shell:
+        "blastdbcmd -db {input.ref} -entry_batch {input.ids} > {output}"
+
+rule extract_genomic_ids_of_matches_sequences:
     input:"blast/protein2genome.outfmt6"
     output:"blast/list_of_regions.txt"
     message:"extracting scaffold(s) / chromosome(s) matched by protein of interest"
@@ -72,12 +83,5 @@ rule find_scaffold_or_chromosome:
         tblastn -num_threads {THREADS} {TBLASTN_PARAMS} -query {input.protein} -db {input.ref} -out {output};
         sed -i '1s/^/{BLAST_HEADER}\\n/' {output} 
         """    
-
-
-
-
-
-
-
 
 
