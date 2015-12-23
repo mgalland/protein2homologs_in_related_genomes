@@ -10,11 +10,11 @@
 		}
 	},
 	"blast": {
+		"header":"qseqid qlen sseqid stitle qstart qend sstart send pident evalue bitscore length",
 		"tblastn": {
-			"max_target_seqs":"-max_target_seqs 10",
-			"outfmt":	"-outfmt '6 qseqid qlen sseqid stitle slen pident evalue bitscore length'",
+			"outfmt":	"-outfmt '6 qseqid qlen sseqid stitle qstart qend sstart send pident evalue bitscore length'",
 			"evalue": 	"-evalue 1e-4",
-			"max_target_seqs": "1"
+			"max_target_seqs": "-max_target_seqs 1"
 			}
 	}
 }
